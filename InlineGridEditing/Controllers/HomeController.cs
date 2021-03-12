@@ -26,7 +26,7 @@ namespace InlineGridEditing.Controllers
             {
                 employeesInline = new EmployeeInline()
                 {
-                    _id = i.ToString(),
+                    id = i,
                     firstName = "Name" + i.ToString(),
                     lastName = "Last name" + i.ToString(),
                     lastSSN = "Last  SSN" + i.ToString(),
@@ -67,19 +67,23 @@ namespace InlineGridEditing.Controllers
             return EmpList;
         }
         [HttpPost]
-        public List<EmployeeInline> EditEmployee(EmployeeInline employee)
+        public IActionResult EditEmployee(EmployeeInline employee)
         {
             //  EmployeeInline employee = new EmployeeInline();
-            string empid = Request.Form["_id"].ToString();
-            if (employee._id == null)
+            bool status = false;
+            try
             {
-                employee._id = (EmpList.Count + 1).ToString();
+
+            
+            if (employee.id == -1)
+            {
+                employee.id = (EmpList.Count + 1);
                 EmpList.Add(employee);
             }
             else
             {
 
-                foreach (EmployeeInline emp in EmpList.Where(w => w._id == employee._id).ToList())
+                foreach (EmployeeInline emp in EmpList.Where(w => w.id == employee.id).ToList())
                 {
                     emp.firstName = employee.firstName;
                     emp.age = employee.age;
@@ -92,13 +96,40 @@ namespace InlineGridEditing.Controllers
 
                 }
             }
-            return EmpList;
+                status = true;
+            }
+            catch (Exception)
+            {
+
+                 
+            }
+            return Json(new { Status = status, EmpId = employee.id });
+
         }
         [HttpPost]
         public List<EmployeeInline> AddEmployee([FromBody] EmployeeInline employee)
         {
             EmpList.Add(employee);
             return EmpList;
+        }
+        [HttpDelete]
+        public IActionResult DeleteEmployee(int id)
+        {
+            bool status = false;
+
+            try
+            {
+                EmployeeInline employeeInline = EmpList.FirstOrDefault(c => c.id == id);
+                if (employeeInline != null)
+                {
+                    EmpList.Remove(employeeInline);
+                    status = true;
+                }
+            }
+            catch
+            { }
+
+            return Json(status);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

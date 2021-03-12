@@ -3,6 +3,9 @@
 }
 
 <link href="~/css/site.css" rel="stylesheet" />
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/JQGridReq/jquery-1.9.0.min.js" type="text/javascript"></script>
 <link href="~/JQGridReq/jquery-ui-1.9.2.custom.css" rel="stylesheet" type="text/css" />
 <script src="~/JQGridReq/jquery.jqGrid.js" type="text/javascript"></script>
@@ -12,92 +15,44 @@
 </table>
 <div id="jQGridDemoPager">
 </div>
- 
+
 <script type="text/javascript">
-    jQuery("#jQGridDemo").jqGrid({
-        url: 'Home/GetEmployees',
-        datatype: "json",
-        colNames: ['Id', 'First Name', 'Last Name', 'Last 4 SSN', 'Department', 'Age', 'Salary', 'Marital Status', 'Permenant'],
-        colModel: [
-            { name: '_id', index: '_id', width: 20, stype: 'text', editable: true},
-            { name: 'firstName', index: 'firstName', width: 150, stype: 'text', sortable: true, editable: true },
-            { name: 'lastName', index: 'lastName', width: 150, stype: 'text',editable: true },
-            { name: 'lastSSN', index: 'lastSSN', width: 60, stype: 'text',editable: true },
-            { name: 'department', index: 'department', width: 80, align: "right", editable: true, edittype: "select", formatter: 'select', editoptions: { value: "IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail" } },
-            { name: 'age', index: 'age', width: 40, align: "right", editable: true },
-            { name: 'salary', index: 'salary', width: 80, align: "right", editable: true },
-            { name: 'maritalStatus', index: 'maritalStatus', width: 100, sortable: false, editable: true, edittype: "select", formatter: 'select', editoptions: { value: "Married:Married;Single:Single;Divorced:Divorced" } },
-            { name: 'permenant', index: 'permenant', width: 100, sortable: true, editable: true, edittype: "checkbox", editoptions: { value: "Yes:No" } }
-        ],
-        rowNum: 10,
-        mtype: 'GET',
-        loadonce: true,
-        rowList: [10, 20, 30],
-        pager: '#jQGridDemoPager',
-        sortname: '_id',
-        viewrecords: true,
-        sortorder: 'desc',
-        caption: "List Employee Details",
-        editurl: 'Home/EditEmployee'
-    });
-    $('#jQGridDemo').jqGrid('navGrid', '#jQGridDemoPager',
-        {
-            edit: true,
-            add: false,
-            del: false,
-            search: false
-        }
-    );
+     $(function () {
+         var $starWarsCharacters = $('#jQGridDemo');
+            $starWarsCharacters.jqGrid({
+                url: '@Url.Action("GetEmployees", "Home")',
+                editurl: '@Url.Action("EditEmployee", "Home")',
+                datatype: 'json',
+                mtype: 'POST',
+                cmTemplate: { align: 'center' },
+                colNames: ['', 'First Name', 'Last Name', 'Last 4 SSN', 'Department', 'Age', 'Salary', 'Marital Status', 'Permenant'],
+                colModel: [
+                    { formatter: 'actions', formatoptions: { keys: true, delOptions: { url: '@Url.Action("DeleteEmployee", "Home")' } }, resizable: false, width: 60, name: 'actions' },
+                    { name: 'firstName', editable: true, editrules: { required: true } },
+                    { name: 'lastName', sortable: false,  editable: true},
+                    { name: 'lastSSN', editable: true },
+                    { name: 'department', sortable: false, editable: true, edittype: 'select', formatter: 'select', edittype: 'select', editoptions: { value:  "IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail"  } },
+                    { name: 'age', editable: true, editrules: { integer: true, minValue: 0 } },     //"IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail"
+                    { name: 'salary', editable: true, editrules: { integer: true, minValue: 0 } },
+                    { name: 'maritalStatus', sortable: false, editable: true, edittype: 'select', formatter: 'select', editoptions: { value:  "Married:Married;Single:Single;Divorced:Divorced" }  },
+                    { name: 'permenant', sortable: false, editable: true, edittype: 'checkbox', editoptions: { value: "Yes:No" }, editrules: { required: true } }
 
-    $("#jQGridDemo").jqGrid('inlineNav', '#jQGridDemoPager',
-        {
-            edit: true,
-            editicon: "ui-icon-pencil",
-            add: true,
-            addicon: "ui-icon-plus",
-            save: true,
-            saveicon: "ui-icon-disk",
-            cancel: true,
-            cancelicon: "ui-icon-cancel",
+                    ],
+                caption: 'StarWars Characters',
+                footerrow: true,
+                userDataOnFooter: true,
+                jsonReader: { repeatitems: false, id: 'id' },
+                pager: $('#jQGridDemoPager'),
+                rowNum: 10,
+                sortname: 'id',
+                sortorder: 'asc',
+                viewrecords: true,
+                height: '100%' //, editrules: { required: true, integer: true, minValue: 0 }
+            })
+                .jqGrid('navGrid', '#jQGridDemoPager', { add: false, edit: false, del: false, search: false })
+                .jqGrid('inlineNav', '#jQGridDemoPager', { edit: false, addParams: { rowID: '-1' } })
+            .bind('jqGridInlineSuccessSaveRow', demo.jqGrid.onJqGridInlineSuccessSaveRow)
+            .bind('jqGridInlineAfterSaveRow', demo.jqGrid.onJqGridInlineAfterSaveRow);
+        });
 
-            editParams: {
-                keys: false,
-                oneditfunc: null,
-                successfunc: function (val) {
-                    if (val.responseText != "") {
-                       // alert(val.responseText);
-                        $(this).jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
-                    }
-                },
-                url: 'Home/EditEmployee',
-                extraparam: {
-                    //_id: function () {
-                    //    var sel_id = $('#jQGridDemo').jqGrid('getGridParam', 'selrow');
-                    //    var value = $('#jQGridDemo').jqGrid('getCell', sel_id, '_id');
-                    //    return value;
-                    //}
-                },
-                aftersavefunc: null,
-                errorfunc: null,
-                afterrestorefunc: null,
-                restoreAfterError: true,
-                mtype: "POST"
-            },
-            addParams: {
-                useDefValues: true,
-                url: 'Home/AddEmployee',
-                addRowParams: {
-                    keys: true,
-                    extraparam: {},
-                    // oneditfunc: function () { alert(); },
-                    successfunc: function (val) {
-                        if (val.responseText != "") {
-                          //  alert(val.responseText);
-                            $(this).jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
-                        }
-                    }
-                }
-            }
-        }
-    );      
 </script>

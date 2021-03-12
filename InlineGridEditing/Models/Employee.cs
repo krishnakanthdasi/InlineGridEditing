@@ -20,7 +20,7 @@ namespace InlineGridEditing.Models
     public class EmployeeInline
     {
 
-        public string _id { get; set; }
+        public int id { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }
         public string lastSSN { get; set; }
