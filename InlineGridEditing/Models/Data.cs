@@ -28,7 +28,7 @@ namespace InlineGridEditing.Models
                     age = 30,
                     salary = "30000",
                     maritalStatus = "Married",
-                    permenant = "True"
+                    permenant = "No"
                 };
                 EmpList.Add(employeesInline);
             }

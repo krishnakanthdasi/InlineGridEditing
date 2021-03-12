@@ -75,7 +75,7 @@ namespace InlineGridEditing.Controllers
 
                  
             }
-            return Json(new { Status = status, EmpId = employee.id });
+            return Json(new { status = status, EmpId = employee.id });
 
         }
         

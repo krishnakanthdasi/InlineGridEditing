@@ -18,41 +18,45 @@
 
 <script type="text/javascript">
      $(function () {
-         var $starWarsCharacters = $('#jQGridDemo');
-            $starWarsCharacters.jqGrid({
-                url: '@Url.Action("GetEmployees", "Home")',
-                editurl: '@Url.Action("EditEmployee", "Home")',
-                datatype: 'json',
-                mtype: 'POST',
-                cmTemplate: { align: 'center' },
-                colNames: ['', 'First Name', 'Last Name', 'Last 4 SSN', 'Department', 'Age', 'Salary', 'Marital Status', 'Permenant'],
-                colModel: [
-                    { formatter: 'actions', formatoptions: { keys: true, delOptions: { url: '@Url.Action("DeleteEmployee", "Home")' } }, resizable: false, width: 60, name: 'actions' },
-                    { name: 'firstName', editable: true, editrules: { required: true } },
-                    { name: 'lastName', sortable: false,  editable: true},
-                    { name: 'lastSSN', editable: true },
-                    { name: 'department', sortable: false, editable: true, edittype: 'select', formatter: 'select', edittype: 'select', editoptions: { value:  "IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail"  } },
-                    { name: 'age', editable: true, editrules: { integer: true, minValue: 0 } },     //"IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail"
-                    { name: 'salary', editable: true, editrules: { integer: true, minValue: 0 } },
-                    { name: 'maritalStatus', sortable: false, editable: true, edittype: 'select', formatter: 'select', editoptions: { value:  "Married:Married;Single:Single;Divorced:Divorced" }  },
-                    { name: 'permenant', sortable: false, editable: true, edittype: 'checkbox', editoptions: { value: "Yes:No" }, editrules: { required: true } }
+         var $inlineGridEdit = $('#jQGridDemo');
+         $inlineGridEdit.jqGrid({
+             url: '@Url.Action("GetEmployees", "Home")',
+             editurl: '@Url.Action("EditEmployee", "Home")',
+             datatype: 'json',
+             mtype: 'POST',
+             cmTemplate: { align: 'center' },
+             colNames: ['', 'First Name', 'Last Name', 'Last 4 SSN', 'Department', 'Age', 'Salary', 'Marital Status', 'Permenant'],
+             colModel: [
+                 { formatter: 'actions', formatoptions: { keys: true, delOptions: { url: '@Url.Action("DeleteEmployee", "Home")' } }, resizable: false, width: 60, name: 'actions' },
+                 { name: 'firstName', editable: true, editrules: { required: true } },
+                 { name: 'lastName', sortable: false, editable: true },
+                 { name: 'lastSSN', editable: true },
+                 { name: 'department', sortable: false, formatter: 'select' ,editable: true, edittype: 'select', formatter: 'select', edittype: 'select', editoptions: { value: "IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail" } },
+                 { name: 'age', editable: true, editrules: { integer: true, minValue: 0 } },     //"IT:IT;Finance:Finance;REFM:REFM;Purchase:Purchase;Retail:Retail"
+                 { name: 'salary', editable: true, editrules: { integer: true, minValue: 0 } },
+                 { name: 'maritalStatus', sortable: false, editable: true, edittype: 'select', formatter: 'select', editoptions: { value: "Married:Married;Single:Single;Divorced:Divorced" } },
+                 { name: 'permenant', sortable: false, editable: true, edittype: 'checkbox', editoptions: { value: "Yes:No" }, editrules: { required: true } }
 
-                    ],
-                caption: 'StarWars Characters',
-                footerrow: true,
-                userDataOnFooter: true,
-                jsonReader: { repeatitems: false, id: 'id' },
-                pager: $('#jQGridDemoPager'),
-                rowNum: 10,
-                sortname: 'id',
-                sortorder: 'asc',
-                viewrecords: true,
-                height: '100%' //, editrules: { required: true, integer: true, minValue: 0 }
-            })
-                .jqGrid('navGrid', '#jQGridDemoPager', { add: false, edit: false, del: false, search: false })
-                .jqGrid('inlineNav', '#jQGridDemoPager', { edit: false, addParams: { rowID: '-1' } })
-            .bind('jqGridInlineSuccessSaveRow', demo.jqGrid.onJqGridInlineSuccessSaveRow)
-            .bind('jqGridInlineAfterSaveRow', demo.jqGrid.onJqGridInlineAfterSaveRow);
+             ],
+             caption: 'Inline grid editing',
+             footerrow: true,
+             userDataOnFooter: false,
+             jsonReader: { repeatitems: false, id: 'id' },
+             pager: $('#jQGridDemoPager'),
+             rowNum: 10,
+             sortname: 'id',
+             sortorder: 'asc',
+             viewrecords: true,
+             height: '100%'
+         })
+             .jqGrid('navGrid', '#jQGridDemoPager', { add: false, edit: true, del: false, search: false })
+             .jqGrid('inlineNav', '#jQGridDemoPager', { edit: false, addParams: { rowID: '-1' } })
+             .jqGrid("editRow", id, true, '', '', '', '', reload)
+             .bind('jqGridInlineSuccessSaveRow', demo.jqGrid.onJqGridInlineSuccessSaveRow)
+             .bind('jqGridInlineAfterSaveRow', demo.jqGrid.onJqGridInlineAfterSaveRow);
         });
 
+    function reload(rowid, result) {
+        $("#grid").trigger("reloadGrid");
+    }
 </script>
